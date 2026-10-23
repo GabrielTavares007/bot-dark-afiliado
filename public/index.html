@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Afiliado</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #f8fafc; margin: 0; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; background: #1e293b; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #334155; border: none; color: white; border-radius: 6px; box-sizing: border-box; }
+        button { background: #3b82f6; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        button:hover { background: #2563eb; }
+        #resultado { margin-top: 20px; padding: 15px; background: #0f172a; border-radius: 6px; display: none; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-family: inherit; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🚀 Motor de Vídeos Virais</h2>
+        <input type="text" id="urlTiktok" placeholder="Cole o link do vídeo do TikTok aqui...">
+        <input type="text" id="urlShopee" placeholder="Cole o seu link de afiliado da Shopee aqui...">
+        <button onclick="processarVideo()">Processar Vídeo e Gerar Copy</button>
+
+        <div id="resultado">
+            <h3>✅ Processo Concluído!</h3>
+            <p><strong>Legenda Sugerida:</strong></p>
+            <pre id="textoLegenda"></pre>
+            <p><em>O vídeo editado e sem marca d'água foi salvo na sua pasta 'downloads'.</em></p>
+        </div>
+    </div>
+
+    <script>
+        async function processarVideo() {
+            const urlTiktok = document.getElementById('urlTiktok').value;
+            const urlShopee = document.getElementById('urlShopee').value;
+            const btn = document.querySelector('button');
+            const divResultado = document.getElementById('resultado');
+            
+            if(!urlTiktok || !urlShopee) return alert('Preencha os dois links!');
+            
+            btn.innerText = 'Processando... (Isso pode levar uns 30 segundos)';
+            btn.disabled = true;
+
+            try {
+                const resposta = await fetch('http://localhost:3000/gerar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tiktok: urlTiktok, shopee: urlShopee })
+                });
+                
+                const dados = await resposta.json();
+                
+                document.getElementById('textoLegenda').innerText = dados.legenda + "\n\n🔗 Link: " + dados.link;
+                divResultado.style.display = 'block';
+            } catch (e) {
+                alert('Erro ao processar o vídeo. Verifique o terminal do VS Code.');
+            }
+            
+            btn.innerText = 'Processar Vídeo e Gerar Copy';
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
